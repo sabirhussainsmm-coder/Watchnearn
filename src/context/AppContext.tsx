@@ -1170,18 +1170,37 @@ const INITIAL_WITHDRAWALS: WithdrawalRequest[] = [
   },
 ];
 
+function safeGetJSON<T>(key: string, fallback: T): T {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return fallback;
+    return JSON.parse(saved) as T;
+  } catch (e) {
+    console.warn(`Error reading ${key} from localStorage:`, e);
+    return fallback;
+  }
+}
+
 const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentRole, setCurrentRole] = useState<UserRole>('worker');
   const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
-    return localStorage.getItem(`${STORAGE_KEY}_current_user_id`);
+    try {
+      return localStorage.getItem(`${STORAGE_KEY}_current_user_id`);
+    } catch {
+      return null;
+    }
   });
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_theme`);
-    const validThemes: AppTheme[] = ['deep_navy', 'midnight_blue', 'charcoal', 'light', 'violet'];
-    if (saved && validThemes.includes(saved as AppTheme)) {
-      return saved as AppTheme;
+    try {
+      const saved = localStorage.getItem(`${STORAGE_KEY}_theme`);
+      const validThemes: AppTheme[] = ['deep_navy', 'midnight_blue', 'charcoal', 'light', 'violet'];
+      if (saved && validThemes.includes(saved as AppTheme)) {
+        return saved as AppTheme;
+      }
+    } catch {
+      // ignore
     }
     return 'deep_navy';
   });
@@ -1192,18 +1211,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // User Sessions & Logins (Advertiser and Worker visibility)
   const [userSessions, setUserSessions] = useState<UserSession[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_sessions`);
-    return saved ? JSON.parse(saved) : INITIAL_SESSIONS;
+    return safeGetJSON(`${STORAGE_KEY}_sessions`, INITIAL_SESSIONS);
   });
 
   // Real-Time Login Audit Logs (Admin Clearance Only)
   const [loginAuditLogs, setLoginAuditLogs] = useState<LoginAuditRecord[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_login_audits`);
-    return saved ? JSON.parse(saved) : INITIAL_LOGIN_AUDIT_LOGS;
+    return safeGetJSON(`${STORAGE_KEY}_login_audits`, INITIAL_LOGIN_AUDIT_LOGS);
   });
 
   useEffect(() => {
-    localStorage.setItem(`${STORAGE_KEY}_login_audits`, JSON.stringify(loginAuditLogs));
+    try {
+      localStorage.setItem(`${STORAGE_KEY}_login_audits`, JSON.stringify(loginAuditLogs));
+    } catch (e) {
+      console.warn('Failed to save login audits to localStorage', e);
+    }
   }, [loginAuditLogs]);
 
   const addLoginAuditLog = (
@@ -1239,44 +1260,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Referrals
   const [referrals, setReferrals] = useState<ReferralRecord[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_referrals`);
-    return saved ? JSON.parse(saved) : INITIAL_REFERRALS;
+    return safeGetJSON(`${STORAGE_KEY}_referrals`, INITIAL_REFERRALS);
   });
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
   const [users, setUsers] = useState<UserProfile[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_users`);
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
+    return safeGetJSON(`${STORAGE_KEY}_users`, INITIAL_USERS);
   });
 
   const [campaigns, setCampaigns] = useState<VideoCampaign[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_campaigns`);
-    return saved ? JSON.parse(saved) : INITIAL_CAMPAIGNS;
+    return safeGetJSON(`${STORAGE_KEY}_campaigns`, INITIAL_CAMPAIGNS);
   });
 
   const [deposits, setDeposits] = useState<DepositRequest[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_deposits`);
-    return saved ? JSON.parse(saved) : INITIAL_DEPOSITS;
+    return safeGetJSON(`${STORAGE_KEY}_deposits`, INITIAL_DEPOSITS);
   });
 
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_withdrawals`);
-    return saved ? JSON.parse(saved) : INITIAL_WITHDRAWALS;
+    return safeGetJSON(`${STORAGE_KEY}_withdrawals`, INITIAL_WITHDRAWALS);
   });
 
   const [viewHistory, setViewHistory] = useState<ViewHistoryRecord[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_views`);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-    return [];
+    const list = safeGetJSON<ViewHistoryRecord[]>(`${STORAGE_KEY}_views`, []);
+    return Array.isArray(list) ? list : [];
   });
 
   const [activeVideoModal, setActiveVideoModal] = useState<VideoCampaign | null>(null);

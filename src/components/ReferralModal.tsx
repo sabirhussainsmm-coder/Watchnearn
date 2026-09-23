@@ -30,7 +30,10 @@ export const ReferralModal: React.FC = () => {
   if (!isReferralModalOpen) return null;
 
   const refCode = currentUser.referralCode || 'WATCHPK786';
-  const shareUrl = `https://watchnearn.pk/?ref=${refCode}`;
+  const appOrigin = typeof window !== 'undefined' && window.location && window.location.origin
+    ? window.location.origin
+    : 'https://watchnearn.pk';
+  const shareUrl = `${appOrigin}/?ref=${refCode}`;
 
   const copyToClipboard = (text: string, type: 'code' | 'link') => {
     navigator.clipboard.writeText(text);
