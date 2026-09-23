@@ -25,8 +25,6 @@ export const UserAuthModal: React.FC = () => {
     registerUser,
     loginUser,
     currentUser,
-    allUsers,
-    loginAsUser,
     switchUserRole,
   } = useApp();
 
@@ -386,57 +384,6 @@ export const UserAuthModal: React.FC = () => {
               </button>
             </form>
           )}
-
-          {/* Quick Demo Switcher */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-              Quick Test Profiles (Demo Sandbox):
-            </div>
-            <div className="space-y-1.5">
-              {allUsers.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => {
-                    loginAsUser(u.name, u.phone, u.role);
-                    closeAuthModal();
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs transition border text-left ${
-                    currentUser.id === u.id
-                      ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-300'
-                      : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-850'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-[11px]">
-                      {u.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-bold flex items-center gap-1.5">
-                        <span>{u.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 capitalize font-medium">
-                          {u.role}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {u.email} • {u.phone}
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    {u.approvalStatus === 'approved' ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20">
-                        Approved
-                      </span>
-                    ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20">
-                        Pending Admin
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
         </div>
 

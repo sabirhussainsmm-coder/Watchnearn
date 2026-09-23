@@ -17,12 +17,16 @@ import {
   ExternalLink,
   ShieldCheck,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const {
     currentUser,
+    isLoggedIn,
+    logoutUser,
     switchUserRole,
     openWithdrawModal,
     openReferralModal,
@@ -163,67 +167,79 @@ export const Navbar: React.FC = () => {
                 </span>
               </button>
 
-              {/* User Profile Chip */}
-              <button
-                onClick={openProfileModal}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-200 text-xs font-semibold transition cursor-pointer"
-              >
-                <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
-                  <User className="w-3.5 h-3.5" />
-                </div>
-                <span className="font-bold text-white max-w-[100px] truncate">{currentUser.name}</span>
-                {currentUser.approvalStatus === 'approved' ? (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" title="Account Approved" />
-                ) : (
-                  <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-300">Pending</span>
-                )}
-              </button>
-
-              {/* Reset State */}
-              <button
-                onClick={resetDemoData}
-                title="Reset Demo State"
-                className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-              </button>
+              {/* User Profile Chip or Sign In / Login Button */}
+              {!isLoggedIn ? (
+                <button
+                  onClick={openAuthModal}
+                  className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20 transition cursor-pointer active:scale-95"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Sign In / Login</span>
+                </button>
+              ) : (
+                <button
+                  onClick={openProfileModal}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-200 text-xs font-semibold transition cursor-pointer"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="font-bold text-white max-w-[100px] truncate">{currentUser.name}</span>
+                  {currentUser.approvalStatus === 'approved' ? (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" title="Account Approved" />
+                  ) : (
+                    <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-300">Pending</span>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* Mobile Header Controls */}
             <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
-              
-              {/* Role Indicator / Quick Toggle */}
-              <button
-                onClick={() => switchUserRole(currentUser.role === 'worker' ? 'advertiser' : 'worker')}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer ${
-                  currentUser.role === 'worker'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                }`}
-                title="Tap to switch mode"
-              >
-                {currentUser.role === 'worker' ? (
-                  <>
-                    <Coins className="w-3 h-3" />
-                    <span>Worker</span>
-                  </>
-                ) : (
-                  <>
-                    <Video className="w-3 h-3" />
-                    <span>Advertiser</span>
-                  </>
-                )}
-              </button>
+              {!isLoggedIn ? (
+                <button
+                  onClick={openAuthModal}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs shadow-sm cursor-pointer active:scale-95"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
+                </button>
+              ) : (
+                <>
+                  {/* Role Indicator / Quick Toggle */}
+                  <button
+                    onClick={() => switchUserRole(currentUser.role === 'worker' ? 'advertiser' : 'worker')}
+                    className={`px-2 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 cursor-pointer ${
+                      currentUser.role === 'worker'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    }`}
+                    title="Tap to switch mode"
+                  >
+                    {currentUser.role === 'worker' ? (
+                      <>
+                        <Coins className="w-3 h-3" />
+                        <span>Worker</span>
+                      </>
+                    ) : (
+                      <>
+                        <Video className="w-3 h-3" />
+                        <span>Advertiser</span>
+                      </>
+                    )}
+                  </button>
 
-              {/* Mobile Wallet Button (Tapping opens cashout) */}
-              <button
-                onClick={openWithdrawModal}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs shadow-sm cursor-pointer active:scale-95 transition"
-                title="Withdraw"
-              >
-                <Wallet className="w-3.5 h-3.5" />
-                <span>{formatPKR(currentUser.walletBalancePKR)}</span>
-              </button>
+                  {/* Mobile Wallet Button (Tapping opens cashout) */}
+                  <button
+                    onClick={openWithdrawModal}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs shadow-sm cursor-pointer active:scale-95 transition"
+                    title="Withdraw"
+                  >
+                    <Wallet className="w-3.5 h-3.5" />
+                    <span>{formatPKR(currentUser.walletBalancePKR)}</span>
+                  </button>
+                </>
+              )}
 
               {/* Mobile Drawer Hamburger Button */}
               <button
@@ -271,49 +287,70 @@ export const Navbar: React.FC = () => {
                 </button>
               </div>
 
-              {/* User Profile Card */}
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">
-                      {currentUser.name.charAt(0)}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{currentUser.phone || currentUser.email}</div>
-                    </div>
+              {/* User Profile Card or Sign In Prompt */}
+              {!isLoggedIn ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-850 border border-slate-800 space-y-2.5 text-center">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center font-bold">
+                    <LogIn className="w-5 h-5" />
                   </div>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                    currentUser.approvalStatus === 'approved'
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'bg-amber-500/20 text-amber-400'
-                  }`}>
-                    {currentUser.approvalStatus === 'approved' ? 'Approved' : 'Pending'}
-                  </span>
-                </div>
-
-                {/* Quick actions for profile */}
-                <div className="grid grid-cols-2 gap-1.5 pt-1">
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      openProfileModal();
-                    }}
-                    className="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition text-center cursor-pointer"
-                  >
-                    View Profile
-                  </button>
+                  <div>
+                    <div className="text-xs font-black text-white">Sign In / Register</div>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Log in to view your wallet balance and watch videos to earn PKR.</p>
+                  </div>
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       openAuthModal();
                     }}
-                    className="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition text-center cursor-pointer"
+                    className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md transition cursor-pointer"
                   >
-                    Switch Account
+                    Sign In / Register
                   </button>
                 </div>
-              </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-sm shrink-0">
+                        {currentUser.name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
+                        <div className="text-[10px] text-slate-400 truncate">{currentUser.phone || currentUser.email}</div>
+                      </div>
+                    </div>
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                      currentUser.approvalStatus === 'approved'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {currentUser.approvalStatus === 'approved' ? 'Approved' : 'Pending'}
+                    </span>
+                  </div>
+
+                  {/* Quick actions for profile */}
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        openProfileModal();
+                      }}
+                      className="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition text-center cursor-pointer"
+                    >
+                      View Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        logoutUser();
+                      }}
+                      className="py-1.5 px-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-[11px] font-bold rounded-lg transition text-center cursor-pointer"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Role Switcher in Drawer */}
               <div className="space-y-1.5">
@@ -434,20 +471,6 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
 
-            </div>
-
-            {/* Bottom Reset Demo */}
-            <div className="pt-4 border-t border-slate-800 mt-4">
-              <button
-                onClick={() => {
-                  resetDemoData();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Reset Demo State</span>
-              </button>
             </div>
 
           </div>

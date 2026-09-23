@@ -32,6 +32,7 @@ export const UserProfileModal: React.FC = () => {
     openWithdrawModal,
     openAuthModal,
     openReferralModal,
+    logoutUser,
     showToast,
   } = useApp();
 
@@ -141,13 +142,13 @@ export const UserProfileModal: React.FC = () => {
             <button
               onClick={() => {
                 closeProfileModal();
-                openAuthModal();
+                logoutUser();
               }}
-              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
-              title="Switch to another user or register new"
+              className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-semibold border border-rose-500/30 transition flex items-center gap-1.5 cursor-pointer"
+              title="Log Out of your account"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Switch User</span>
+              <span>Log Out</span>
             </button>
             <button
               onClick={closeProfileModal}

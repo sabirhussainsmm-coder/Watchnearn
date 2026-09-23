@@ -31,6 +31,8 @@ export const TaskBoard: React.FC = () => {
     viewHistory,
     openWithdrawModal,
     openReferralModal,
+    openAuthModal,
+    isLoggedIn,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'tasks' | 'history'>('tasks');
@@ -40,8 +42,12 @@ export const TaskBoard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showActivationModal, setShowActivationModal] = useState(false);
 
-  // Intercept video play if worker is not yet activated
+  // Intercept video play if worker is not yet activated or not logged in
   const handleStartTask = (campaign: VideoCampaign) => {
+    if (!isLoggedIn) {
+      openAuthModal();
+      return;
+    }
     if (currentUser.activationStatus !== 'activated') {
       setShowActivationModal(true);
       return;
@@ -86,8 +92,37 @@ export const TaskBoard: React.FC = () => {
   return (
     <div className="space-y-4 sm:space-y-5">
       
-      {/* Worker Account Activation Banner (Clean & Punchy) */}
-      {currentUser.activationStatus !== 'activated' && (
+      {/* Guest Welcome Banner or Worker Activation Banner */}
+      {!isLoggedIn ? (
+        <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-emerald-950/40 border border-emerald-500/40 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm sm:text-base font-extrabold text-white">
+                  Join WatchNEarn • Just $3.6 (1,000 PKR)
+                </h3>
+                <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950">
+                  Daily Earnings
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                Sign in or register to watch verified YouTube videos and earn daily PKR via JazzCash & EasyPaisa.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={openAuthModal}
+            className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+          >
+            <span>Sign In / Register</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      ) : currentUser.activationStatus !== 'activated' ? (
         <div className="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-950/70 via-slate-900 to-amber-950/40 border border-amber-500/40 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
@@ -118,7 +153,7 @@ export const TaskBoard: React.FC = () => {
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
-      )}
+      ) : null}
 
       {/* Hero Performance Header (Reduced Text, Modern, Mobile Friendly) */}
       <div className="hero-banner rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/60 border border-slate-800 p-4 sm:p-5 shadow-lg">

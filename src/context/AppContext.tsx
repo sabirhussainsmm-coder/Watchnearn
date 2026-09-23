@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
   ADMIN_SECURITY_PIN,
   AppTheme,
   DepositRequest,
+  GUEST_USER,
   LoginAuditRecord,
   PaymentGateway,
   PLATFORM_CONFIG,
@@ -21,6 +22,8 @@ import { parseVideoUrl } from '../utils/video';
 interface AppContextType {
   currentUser: UserProfile;
   allUsers: UserProfile[];
+  isLoggedIn: boolean;
+  logoutUser: () => void;
   switchUserRole: (role: UserRole) => void;
   campaigns: VideoCampaign[];
   createCampaign: (data: {
@@ -1171,6 +1174,9 @@ const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentRole, setCurrentRole] = useState<UserRole>('worker');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(() => {
+    return localStorage.getItem(`${STORAGE_KEY}_current_user_id`);
+  });
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => {
     const saved = localStorage.getItem(`${STORAGE_KEY}_theme`);
     const validThemes: AppTheme[] = ['deep_navy', 'midnight_blue', 'charcoal', 'light', 'violet'];
@@ -1263,14 +1269,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 8) {
+        if (Array.isArray(parsed)) {
           return parsed;
         }
       } catch (e) {
         // ignore
       }
     }
-    return INITIAL_VIEW_HISTORY;
+    return [];
   });
 
   const [activeVideoModal, setActiveVideoModal] = useState<VideoCampaign | null>(null);
@@ -1316,7 +1322,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, 4500);
   };
 
-  const currentUser = users.find((u) => u.role === currentRole) || users[0];
+  const isLoggedIn = !!currentUserId && users.some((u) => u.id === currentUserId);
+
+  const currentUser: UserProfile = useMemo(() => {
+    if (currentRole === 'admin' && isAdminUnlocked) {
+      return users.find((u) => u.role === 'admin') || users[2];
+    }
+    if (currentUserId) {
+      const found = users.find((u) => u.id === currentUserId);
+      if (found) return found;
+    }
+    return GUEST_USER;
+  }, [currentUserId, users, currentRole, isAdminUnlocked]);
 
   const switchTheme = (theme: AppTheme) => {
     setCurrentTheme(theme);
@@ -1997,6 +2014,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     showToast(`Registration submitted! Admin (Sabir Hussain) will verify your Gmail & Phone and approve your account.`, 'info');
+    setCurrentUserId(newUser.id);
+    localStorage.setItem(`${STORAGE_KEY}_current_user_id`, newUser.id);
+    setCurrentRole(newUser.role);
     return { success: true, message: 'Registration submitted. Pending Admin approval.', user: newUser };
   };
 
@@ -2109,6 +2129,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } else {
       showToast(`Welcome back, ${user.name}! Account active & approved.`, 'success');
     }
+
+    setCurrentUserId(updatedUser.id);
+    localStorage.setItem(`${STORAGE_KEY}_current_user_id`, updatedUser.id);
 
     return { success: true, message: 'Login successful.', user: updatedUser };
   };
@@ -2262,6 +2285,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setUserSessions((prev) => [newSession, ...prev.filter((s) => s.userId !== targetUser.id)]);
+    setCurrentUserId(targetUser.id);
+    localStorage.setItem(`${STORAGE_KEY}_current_user_id`, targetUser.id);
     showToast(`Logged in as ${targetUser.name} (${role === 'worker' ? 'Worker Mode' : role === 'advertiser' ? 'Advertiser Mode' : 'Admin Mode'})`, 'success');
   };
 
@@ -2408,19 +2433,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Withdrawal rejected. ${wd.amountPKR} PKR refunded to worker wallet.`, 'info');
   };
 
+  const logoutUser = () => {
+    setCurrentUserId(null);
+    localStorage.removeItem(`${STORAGE_KEY}_current_user_id`);
+    showToast('You have been logged out.', 'info');
+  };
+
   const resetDemoData = () => {
     localStorage.removeItem(`${STORAGE_KEY}_users`);
     localStorage.removeItem(`${STORAGE_KEY}_campaigns`);
     localStorage.removeItem(`${STORAGE_KEY}_deposits`);
     localStorage.removeItem(`${STORAGE_KEY}_withdrawals`);
     localStorage.removeItem(`${STORAGE_KEY}_views`);
+    localStorage.removeItem(`${STORAGE_KEY}_current_user_id`);
+    setCurrentUserId(null);
     setUsers(INITIAL_USERS);
     setCampaigns(INITIAL_CAMPAIGNS);
     setDeposits(INITIAL_DEPOSITS);
     setWithdrawals(INITIAL_WITHDRAWALS);
     setViewHistory([]);
     setCurrentRole('worker');
-    showToast('Platform reset to fresh Pakistani demo seed state!', 'success');
+    showToast('Platform reset to fresh state!', 'success');
   };
 
   return (
@@ -2428,6 +2461,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         currentUser,
         allUsers: users,
+        isLoggedIn,
+        logoutUser,
         switchUserRole,
         campaigns,
         createCampaign,

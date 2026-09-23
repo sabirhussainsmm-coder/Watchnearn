@@ -49,6 +49,27 @@ export interface UserProfile {
   activationPaidPKR?: number;
 }
 
+export const GUEST_USER: UserProfile = {
+  id: 'guest',
+  name: 'Guest User',
+  email: '',
+  phone: '',
+  role: 'worker',
+  approvalStatus: 'pending_approval',
+  walletBalancePKR: 0,
+  depositBalancePKR: 0,
+  totalEarnedPKR: 0,
+  totalWithdrawnPKR: 0,
+  totalTasksCompleted: 0,
+  joinedDate: '',
+  referralCode: '',
+  referralBonusPKR: 0,
+  referralEarningsPKR: 0,
+  totalReferralsCount: 0,
+  isActivated: false,
+  activationStatus: 'unpaid',
+};
+
 export interface UserSession {
   id: string;
   userId: string;

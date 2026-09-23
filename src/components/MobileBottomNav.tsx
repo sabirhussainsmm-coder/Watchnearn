@@ -7,16 +7,19 @@ import {
   Gift,
   Video,
   User,
-  History
+  History,
+  LogIn
 } from 'lucide-react';
 
 export const MobileBottomNav: React.FC = () => {
   const {
     currentUser,
+    isLoggedIn,
     switchUserRole,
     openWithdrawModal,
     openReferralModal,
     openProfileModal,
+    openAuthModal,
   } = useApp();
 
   return (
@@ -92,15 +95,19 @@ export const MobileBottomNav: React.FC = () => {
           <span className="text-[10px] mt-0.5 tracking-tight">Advertise</span>
         </button>
 
-        {/* Tab 5: Profile / Account */}
+        {/* Tab 5: Profile / Sign In */}
         <button
-          onClick={openProfileModal}
+          onClick={isLoggedIn ? openProfileModal : openAuthModal}
           className="flex flex-col items-center justify-center h-full py-1 text-slate-400 hover:text-slate-200 transition cursor-pointer"
         >
-          <div className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
-            <User className="w-3.5 h-3.5" />
+          <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${
+            isLoggedIn
+              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+              : 'bg-slate-800 border-slate-700 text-slate-300'
+          }`}>
+            {isLoggedIn ? <User className="w-3.5 h-3.5" /> : <LogIn className="w-3.5 h-3.5" />}
           </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Account</span>
+          <span className="text-[10px] mt-0.5 tracking-tight">{isLoggedIn ? 'Account' : 'Sign In'}</span>
         </button>
 
       </div>

@@ -20,6 +20,8 @@ export const WithdrawModal: React.FC = () => {
     isWithdrawModalOpen,
     closeWithdrawModal,
     currentUser,
+    isLoggedIn,
+    openAuthModal,
     submitWithdrawal,
     withdrawals,
     showToast,
@@ -27,8 +29,8 @@ export const WithdrawModal: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'request' | 'history'>('request');
   const [gateway, setGateway] = useState<PaymentGateway>('jazzcash');
-  const [accountTitle, setAccountTitle] = useState(currentUser.name || '');
-  const [mobileNumber, setMobileNumber] = useState(currentUser.phone || '');
+  const [accountTitle, setAccountTitle] = useState(isLoggedIn && currentUser.id !== 'guest' ? currentUser.name : '');
+  const [mobileNumber, setMobileNumber] = useState(isLoggedIn && currentUser.id !== 'guest' ? currentUser.phone : '');
   const [amountPKR, setAmountPKR] = useState<number>(500);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -101,8 +103,32 @@ export const WithdrawModal: React.FC = () => {
           </button>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex border-b border-gray-800 bg-gray-950/50 px-6 pt-2">
+        {/* If user is not logged in */}
+        {!isLoggedIn ? (
+          <div className="p-8 text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center font-bold">
+              <Wallet className="w-7 h-7" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white">Sign In Required</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Please sign in to access your wallet and request JazzCash / EasyPaisa cashouts.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                closeWithdrawModal();
+                openAuthModal();
+              }}
+              className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs shadow-md transition cursor-pointer"
+            >
+              Sign In to Continue
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Tab Switcher */}
+            <div className="flex border-b border-gray-800 bg-gray-950/50 px-6 pt-2">
           <button
             onClick={() => setActiveTab('request')}
             className={`pb-3 px-4 text-xs font-bold border-b-2 transition ${
@@ -381,6 +407,8 @@ export const WithdrawModal: React.FC = () => {
             </div>
           )}
         </div>
+        </>
+        )}
 
       </div>
     </div>
