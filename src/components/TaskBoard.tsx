@@ -121,47 +121,47 @@ export const TaskBoard: React.FC = () => {
       )}
 
       {/* Hero Performance Header (Reduced Text, Modern, Mobile Friendly) */}
-      <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/60 border border-slate-800 p-4 sm:p-5 shadow-lg">
+      <div className="hero-banner rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/60 border border-slate-800 p-4 sm:p-5 shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Left: Punchy title & quick status */}
           <div className="space-y-1">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold">
-              <Sparkles className="w-3 h-3" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
               <span>Join in Just 3.6 Dollars • Instant JazzCash & EasyPaisa</span>
             </div>
             
-            <h1 className="text-xl sm:text-2xl font-black text-white">
+            <h1 className="text-xl sm:text-2xl font-black text-white hero-title tracking-tight">
               Watch Videos & Earn PKR Daily
             </h1>
             
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="flex items-center gap-1 text-emerald-400 font-medium">
+            <div className="flex items-center gap-2 text-xs text-slate-300">
+              <span className="flex items-center gap-1 text-emerald-400 font-semibold">
                 <ShieldCheck className="w-3.5 h-3.5" /> Anti-Cheat Active
               </span>
-              <span>•</span>
-              <span>Available Reward: <strong className="text-emerald-400">{formatPKR(potentialEarnings)}</strong></span>
+              <span className="text-slate-500">•</span>
+              <span>Available Reward: <strong className="text-emerald-400 font-bold">{formatPKR(potentialEarnings)}</strong></span>
             </div>
           </div>
 
           {/* Right: Compact Stats Strip */}
-          <div className="grid grid-cols-3 gap-2 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+          <div className="hero-stats-strip grid grid-cols-3 gap-2 bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 shadow-inner">
             <div className="text-center px-1">
-              <div className="text-[10px] text-slate-400">Earned Today</div>
+              <div className="text-[10px] text-slate-400 font-medium">Earned Today</div>
               <div className="text-sm sm:text-base font-black text-emerald-400">
                 {formatPKR(earnedToday)}
               </div>
             </div>
 
             <div className="text-center px-1 border-x border-slate-800">
-              <div className="text-[10px] text-slate-400">Watched</div>
-              <div className="text-sm sm:text-base font-black text-white">
+              <div className="text-[10px] text-slate-400 font-medium">Watched</div>
+              <div className="text-sm sm:text-base font-black text-emerald-400">
                 {viewsToday.length}
               </div>
             </div>
 
             <div className="text-center px-1">
-              <div className="text-[10px] text-slate-400">Balance</div>
+              <div className="text-[10px] text-slate-400 font-medium">Balance</div>
               <div className="text-sm sm:text-base font-black text-emerald-400">
                 {formatPKR(currentUser.walletBalancePKR)}
               </div>

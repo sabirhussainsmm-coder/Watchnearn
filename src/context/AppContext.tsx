@@ -1173,11 +1173,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentRole, setCurrentRole] = useState<UserRole>('worker');
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => {
     const saved = localStorage.getItem(`${STORAGE_KEY}_theme`);
-    const validThemes: AppTheme[] = ['light', 'deep_navy', 'midnight_blue', 'charcoal', 'violet'];
+    const validThemes: AppTheme[] = ['deep_navy', 'midnight_blue', 'charcoal', 'light', 'violet'];
     if (saved && validThemes.includes(saved as AppTheme)) {
       return saved as AppTheme;
     }
-    return 'light';
+    return 'deep_navy';
   });
 
   // Admin PIN Protection (Code 7467)

@@ -11,7 +11,6 @@ import {
   X,
   User,
   History,
-  Lock,
   ChevronRight,
   RefreshCw,
   Palette,
@@ -178,15 +177,6 @@ export const Navbar: React.FC = () => {
                 ) : (
                   <span className="text-[9px] px-1 rounded bg-amber-500/20 text-amber-300">Pending</span>
                 )}
-              </button>
-
-              {/* Admin Lock Button */}
-              <button
-                onClick={handleAdminClick}
-                className="p-2 text-slate-400 hover:text-purple-400 rounded-xl hover:bg-slate-800 transition cursor-pointer"
-                title="Admin Portal (Code 7467)"
-              >
-                <Lock className="w-3.5 h-3.5" />
               </button>
 
               {/* Reset State */}
@@ -415,10 +405,10 @@ export const Navbar: React.FC = () => {
                   className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-900 text-xs font-bold text-purple-300 border border-purple-500/20 transition cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-purple-400" />
+                    <ShieldCheck className="w-4 h-4 text-purple-400" />
                     <span>Admin Portal</span>
                   </div>
-                  <span className="text-[10px] text-purple-400 font-medium">PIN: 7467</span>
+                  <ChevronRight className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
 
