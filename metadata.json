@@ -1,0 +1,8 @@
+{
+  "name": "Remix WatchNEarn - Pay-Per-View Video Watching Micro-Task Platform",
+  "description": "Watch videos, earn PKR daily with JazzCash \u0026 EasyPaisa payouts, and launch high-retention video campaigns in Pakistan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "WatchNEarn - Video Watching Tasks",
+  "short_name": "WatchNEarn",
+  "description": "Watch verified videos, earn daily PKR via JazzCash & EasyPaisa, or launch organic campaigns in Pakistan.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#10b981",
+  "orientation": "portrait",
+  "categories": ["finance", "entertainment", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
